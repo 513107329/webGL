@@ -55,44 +55,49 @@ gui.add(sphere.rotation, "y").min(0).max(10).step(0.1).name("y轴");
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
-const directLight = new THREE.DirectionalLight(0xffffff, 1);
-directLight.position.set(10, 10, 10);
-directLight.castShadow = true;
-scene.add(directLight);
+const spotLight = new THREE.SpotLight(0xffffff, 1);
+spotLight.position.set(10, 10, 10);
+spotLight.castShadow = true;
+scene.add(spotLight);
 
-directLight.shadow.mapSize.width = 2048;
-directLight.shadow.mapSize.height = 2048;
-directLight.shadow.camera.near = 0.5;
-directLight.shadow.camera.far = 50;
-directLight.shadow.camera.top = 5;
-directLight.shadow.camera.bottom = -5;
-directLight.shadow.camera.left = -5;
-directLight.shadow.camera.right = 5;
+spotLight.shadow.mapSize.width = 2048;
+spotLight.shadow.mapSize.height = 2048;
+spotLight.shadow.camera.near = 0.5;
+spotLight.shadow.camera.far = 50;
+spotLight.shadow.camera.fov = 30;
+spotLight.distance = 0
+spotLight.angle = Math.PI / 4
+spotLight.penumbra = 0.5
+spotLight.decay = 1
+gui.add(spotLight, "distance").min(0).max(50).step(0.1).name("distance");
+gui.add(spotLight, "angle").min(0).max(Math.PI / 2).step(0.1).name("angle");
+gui.add(spotLight, "penumbra").min(0).max(1).step(0.1).name("penumbra");
+gui.add(spotLight, "decay").min(0).max(1).step(0.1).name("decay");
 
 gui
-  .add(directLight.shadow.camera, "near")
+  .add(spotLight.shadow.camera, "near")
   .min(0)
   .max(10)
   .step(0.1)
   .name("shadowCameraNear")
   .onChange(() => {
-    directLight.shadow.camera.updateProjectionMatrix();
+    spotLight.shadow.camera.updateProjectionMatrix();
   });
 gui
-  .add(directLight.shadow.camera, "far")
+  .add(spotLight.shadow.camera, "far")
   .min(0)
   .max(50)
   .step(0.1)
   .name("shadowCameraFar")
   .onChange(() => {
-    directLight.shadow.camera.updateProjectionMatrix();
+    spotLight.shadow.camera.updateProjectionMatrix();
   });
 
 // Create OrbitControls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-const helper = new THREE.CameraHelper(directLight.shadow.camera);
+const helper = new THREE.CameraHelper(spotLight.shadow.camera);
 scene.add(helper);
 // Update the rotation speed in the animate function
 function animate() {

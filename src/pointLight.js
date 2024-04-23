@@ -14,7 +14,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.z = 5;
+camera.position.z = 10;
 
 scene.add(camera);
 
@@ -27,7 +27,7 @@ document.body.appendChild(renderer.domElement);
 
 // Create a sphere
 const sphereGeometry = new THREE.SphereGeometry(1, 16, 16);
-const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 sphere.castShadow = true;
 sphere.receiveShadow = false;
@@ -55,47 +55,71 @@ gui.add(sphere.rotation, "y").min(0).max(10).step(0.1).name("y轴");
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
-const directLight = new THREE.DirectionalLight(0xffffff, 1);
-directLight.position.set(10, 10, 10);
-directLight.castShadow = true;
-scene.add(directLight);
+const smallBall = new THREE.Mesh(
+    new THREE.SphereGeometry(0.1, 16, 16),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+)
 
-directLight.shadow.mapSize.width = 2048;
-directLight.shadow.mapSize.height = 2048;
-directLight.shadow.camera.near = 0.5;
-directLight.shadow.camera.far = 50;
-directLight.shadow.camera.top = 5;
-directLight.shadow.camera.bottom = -5;
-directLight.shadow.camera.left = -5;
-directLight.shadow.camera.right = 5;
+const pointLight = new THREE.PointLight(0xff0000, 1);
+pointLight.position.set(2, 2, 2);
+pointLight.castShadow = true;
+// scene.add(pointLight);
+
+smallBall.position.copy(pointLight.position);
+
+smallBall.add(pointLight)
+scene.add(smallBall)
+
+// pointLight.shadow.mapSize.width = 2048;
+// pointLight.shadow.mapSize.height = 2048;
+// pointLight.shadow.camera.fov = 45;
+pointLight.distance = 1
+pointLight.decay = 0
+gui.add(pointLight, "distance").min(0).max(50).step(0.1).name("distance");
+gui.add(pointLight, "decay").min(0).max(1).step(0.1).name("decay");
+
+const helper = new THREE.CameraHelper(pointLight.shadow.camera);
+scene.add(helper);
 
 gui
-  .add(directLight.shadow.camera, "near")
+  .add(pointLight.shadow.camera, "fov")
+  .min(0)
+  .max(90)
+  .step(0.1)
+  .name("fov")
+  .onChange(() => {
+    helper.update()
+    pointLight.shadow.camera.updateProjectionMatrix();
+  });
+gui
+  .add(pointLight.shadow.camera, "near")
   .min(0)
   .max(10)
   .step(0.1)
   .name("shadowCameraNear")
   .onChange(() => {
-    directLight.shadow.camera.updateProjectionMatrix();
+    pointLight.shadow.camera.updateProjectionMatrix();
   });
 gui
-  .add(directLight.shadow.camera, "far")
+  .add(pointLight.shadow.camera, "far")
   .min(0)
   .max(50)
   .step(0.1)
   .name("shadowCameraFar")
   .onChange(() => {
-    directLight.shadow.camera.updateProjectionMatrix();
+    pointLight.shadow.camera.updateProjectionMatrix();
   });
 
 // Create OrbitControls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-
-const helper = new THREE.CameraHelper(directLight.shadow.camera);
-scene.add(helper);
+const clock = new THREE.Clock();
 // Update the rotation speed in the animate function
 function animate() {
+    const time = clock.getElapsedTime();
+    smallBall.position.x = Math.sin(time) * 3;
+    smallBall.position.z = Math.cos(time) * 3;
+    smallBall.position.y = 2 + Math.sin(time * 10)
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
 }

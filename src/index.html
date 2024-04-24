@@ -6,10 +6,36 @@
     <title>webGL</title>
 </head>
 <body>
+    <div class="page page1">
+        <h1>旋转的小球1</h1>
+        <h3>旋转的小球转转转</h3>
+    </div>
+    <div class="page page2">
+        <h1>旋转的小球2</h1>
+        <h3>旋转的小球转转转</h3>
+    </div>
     <style>
-        *, html, body {
+        html, body {
             margin: 0;
             padding: 0;
+        }
+        body {
+            position: relative
+        }
+        .page {
+            position: relative;
+            z-index: 1000;
+            height: 100vh;
+            width: 100%;
+        }
+
+        h1, h3 {
+            text-align: center;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0
         }
     </style>
     <!-- <script type="module" src="./texture.js"></script> -->
@@ -19,6 +45,7 @@
     <!-- <script type="module" src="./pointLight.js"></script> -->
     <!-- <script type="module" src="./point.js"></script> -->
     <!-- <script type="module" src="./pointXh.js"></script> -->
-    <script type="module" src="./star.js"></script>
+    <!-- <script type="module" src="./star.js"></script> -->
+    <script type="module" src="./combine.js"></script>
 </body>
 </html>
